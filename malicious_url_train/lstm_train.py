@@ -8,7 +8,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 BATCH_SIZE = 64
-EPOCHS = 20
+EPOCHS = 50
 VERBOSE = 1
 NB_LSTM_CELLS = 256
 NB_DENSE_CELLS = 256
