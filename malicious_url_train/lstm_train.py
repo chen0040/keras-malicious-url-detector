@@ -10,7 +10,19 @@ from sklearn.model_selection import train_test_split
 BATCH_SIZE = 64
 EPOCHS = 20
 VERBOSE = 1
-NB_LSTM_CELLS = 1024
+NB_LSTM_CELLS = 256
+NB_DENSE_CELLS = 256
+
+
+def make_lstm_model(num_input_tokens):
+    model = Sequential()
+    model.add(LSTM(NB_LSTM_CELLS, input_shape=(None, num_input_tokens), return_sequences=False, return_state=False, dropout=0.2))
+    model.add(Dense(NB_DENSE_CELLS))
+    model.add(Dropout(0.3))
+    model.add(Dense(2, activation='softmax'))
+
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+    return model
 
 
 def main():
@@ -39,6 +51,7 @@ def main():
     config['num_input_tokens'] = num_input_tokens
     config['char2idx'] = char2idx
     config['idx2char'] = idx2char
+    config['max_url_seq_length'] = max_url_seq_length
 
     np.save(model_dir_path + '/' + model_name + '-config.npy', config)
 
@@ -54,13 +67,7 @@ def main():
 
     Xtrain, Xtest, Ytrain, Ytest = train_test_split(X, Y, test_size=0.2, random_state=42)
 
-    model = Sequential()
-    model.add(LSTM(NB_LSTM_CELLS, input_shape=(None, num_input_tokens), return_sequences=False, return_state=False, recurrent_dropout=0.2, dropout=0.2))
-    model.add(Dense(512))
-    model.add(Dropout(0.3))
-    model.add(Dense(2, activation='softmax'))
-
-    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+    model = make_lstm_model(num_input_tokens)
     open(architecture_file_path, 'w').write(model.to_json())
 
     checkpoint = ModelCheckpoint(weight_file_path)
