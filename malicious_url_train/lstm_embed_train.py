@@ -5,10 +5,10 @@ from keras.layers.recurrent import LSTM
 import pandas as pd
 import os
 import numpy as np
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, StratifiedKFold
 
 BATCH_SIZE = 64
-EPOCHS = 50
+EPOCHS = 10
 VERBOSE = 1
 NB_LSTM_CELLS = 256
 NB_DENSE_CELLS = 256
@@ -57,21 +57,37 @@ def main():
 
     data_size = url_data.shape[0]
     X = np.zeros(shape=(data_size, max_url_seq_length))
-    Y = np.zeros(shape=(data_size, 2))
+    Y = np.zeros(shape=(data_size, 1))
     for i in range(data_size):
         url = url_data['text'][i]
         label = url_data['label'][i]
         for idx, c in enumerate(url):
             X[i, idx] = char2idx[c]
-        Y[i, label] = 1
+        Y[i] = label
 
-    Xtrain, Xtest, Ytrain, Ytest = train_test_split(X, Y, test_size=0.2, random_state=42)
+    # Xtrain, Xtest, Ytrain, Ytest = train_test_split(X, Y, test_size=0.2, random_state=42)
 
     model = make_lstm_model(num_input_tokens, max_url_seq_length)
     open(architecture_file_path, 'w').write(model.to_json())
 
     checkpoint = ModelCheckpoint(weight_file_path)
-    model.fit(x=Xtrain, y=Ytrain, batch_size=BATCH_SIZE, epochs=EPOCHS, verbose=VERBOSE, validation_data=(Xtest, Ytest), callbacks=[checkpoint])
+
+    kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    for train, test in kfold.split(X, Y):
+        YtrainCount = Y[train].shape[0]
+        YtestCount = Y[test].shape[0]
+        Ytrain = np.zeros(shape=(YtrainCount, 2))
+        Ytest = np.zeros(shape=(YtestCount, 2))
+        for i in range(YtrainCount):
+            label = int(Y[train][i][0])
+            Ytrain[i, label] = 1
+        for i in range(YtestCount):
+            label = int(Y[test][i][0])
+            Ytest[i, label] = 1
+
+        model.fit(X[train], Ytrain, batch_size=BATCH_SIZE, epochs=EPOCHS, verbose=VERBOSE,
+                  validation_data=(X[test], Ytest), callbacks=[checkpoint])
+
     model.save_weights(weight_file_path)
 
 

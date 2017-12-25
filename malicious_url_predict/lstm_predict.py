@@ -30,7 +30,7 @@ class LstmPredictor(object):
         X = np.zeros(shape=(data_size, self.max_url_seq_length, self.num_input_tokens))
         for idx, c in enumerate(url):
             if c in self.char2idx:
-                X[0, idx, self.char2idx[idx]] = 1
+                X[0, idx, self.char2idx[c]] = 1
         predicted = self.model.predict(X)[0]
         predicted_label = np.argmax(predicted)
         return predicted_label
@@ -47,10 +47,13 @@ def main():
 
     url_data = pd.read_csv(data_dir_path + os.path.sep + 'URL.txt', sep=',')
     url_data.columns = ['text', 'label']
-    for url in url_data['text']:
+    count = 0
+    for url, label in zip(url_data['text'], url_data['label']):
         predicted_label = predictor.predict(url)
-        actual_label = url_data['label']
-        print('predicted: ' + predicted_label + ' actual: ' + actual_label)
+        print('predicted: ' + str(predicted_label) + ' actual: ' + str(label))
+        count += 1
+        if count > 20:
+            break
 
 
 if __name__ == '__main__':
