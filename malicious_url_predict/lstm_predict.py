@@ -1,7 +1,7 @@
 import numpy as np
-import pandas as pd
-import os
+
 from malicious_url_train.lstm_train import make_lstm_model
+from malicious_url_train.url_data_loader import load_url_data
 
 
 class LstmPredictor(object):
@@ -45,8 +45,7 @@ def main():
     predictor = LstmPredictor()
     predictor.load_model(config_file_path=config_file_path, weight_file_path=weight_file_path)
 
-    url_data = pd.read_csv(data_dir_path + os.path.sep + 'URL.txt', sep=',')
-    url_data.columns = ['text', 'label']
+    url_data = load_url_data(data_dir_path)
     count = 0
     for url, label in zip(url_data['text'], url_data['label']):
         predicted_label = predictor.predict(url)

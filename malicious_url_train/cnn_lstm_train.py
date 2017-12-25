@@ -3,8 +3,7 @@ from keras.callbacks import ModelCheckpoint
 from keras.layers import Dense, Embedding, SpatialDropout1D
 from keras.layers.convolutional import Conv1D, MaxPooling1D
 from keras.layers.recurrent import LSTM
-import pandas as pd
-import os
+from malicious_url_train.url_data_loader import load_url_data
 import numpy as np
 from sklearn.model_selection import train_test_split
 
@@ -16,7 +15,7 @@ NB_DENSE_CELLS = 256
 EMBEDDING_SIZE = 100
 
 
-def make_lstm_model(num_input_tokens, max_len):
+def make_cnn_lstm_model(num_input_tokens, max_len):
     model = Sequential()
     model.add(Embedding(input_dim=num_input_tokens, input_length=max_len, output_dim=EMBEDDING_SIZE))
     model.add(SpatialDropout1D(0.2))
@@ -38,9 +37,8 @@ def main():
     weight_file_path = model_dir_path + '/' + model_name + '-weights.h5'
     architecture_file_path = model_dir_path + '/' + model_name + '-architecture.json'
 
-    url_data = pd.read_csv(data_dir_path + os.path.sep + 'URL.txt', sep=',')
-    url_data.columns = ['text', 'label']
-    print(url_data.head())
+    url_data = load_url_data(data_dir_path)
+
     char2idx = dict()
     max_url_seq_length = 0
     for url in url_data['text']:
@@ -60,8 +58,8 @@ def main():
     np.save(model_dir_path + '/' + model_name + '-config.npy', config)
 
     data_size = url_data.shape[0]
-    X = np.zeros(shape=(data_size, max_url_seq_length))
-    Y = np.zeros(shape=(data_size, 2))
+    X = np.zeros(shape=(data_size, max_url_seq_length), dtype=np.int)
+    Y = np.zeros(shape=(data_size, 2), dtype=np.int)
     for i in range(data_size):
         url = url_data['text'][i]
         label = url_data['label'][i]
@@ -69,12 +67,15 @@ def main():
             X[i, idx] = char2idx[c]
         Y[i, label] = 1
 
+    print(X[0, :])
+    print(Y[0, :])
+
     Xtrain, Xtest, Ytrain, Ytest = train_test_split(X, Y, test_size=0.2, random_state=42)
 
-    model = make_lstm_model(num_input_tokens, max_url_seq_length)
+    model = make_cnn_lstm_model(num_input_tokens, max_url_seq_length)
     open(architecture_file_path, 'w').write(model.to_json())
 
-    checkpoint = ModelCheckpoint(weight_file_path)
+    checkpoint = ModelCheckpoint(weight_file_path, save_best_only=True)
     model.fit(x=Xtrain, y=Ytrain, batch_size=BATCH_SIZE, epochs=EPOCHS, verbose=VERBOSE, validation_data=(Xtest, Ytest), callbacks=[checkpoint])
     model.save_weights(weight_file_path)
 

@@ -19,3 +19,11 @@ The following deep learning models have been implemented and studied:
 * CNN + LSTM: this approach uses CNN + LSTM recurrent networks for classifier with categorical cross entropy loss function
     * training: malicious_url_train/cnn_lstm_train.py 
     * predictor: malicious_url_predict/cnn_lstm_predict.py 
+    
+
+# Issues
+
+* Currently the data size of the urls is too small to give an good result
+* Class imbalances - the URL.txt contains class imbalances (more 0 than 1), ideally the problem should be an outlier 
+or anomaly detection problem. To handle the class imabalances, currently a resampling method is used to make sure that 
+there are more or less equal number of each classes

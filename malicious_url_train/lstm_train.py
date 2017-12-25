@@ -2,8 +2,7 @@ from keras.models import Sequential
 from keras.callbacks import ModelCheckpoint
 from keras.layers import Dense, Activation, Dropout
 from keras.layers.recurrent import LSTM
-import pandas as pd
-import os
+from malicious_url_train.url_data_loader import load_url_data
 import numpy as np
 from sklearn.model_selection import train_test_split
 
@@ -19,7 +18,8 @@ def make_lstm_model(num_input_tokens):
     model.add(LSTM(NB_LSTM_CELLS, input_shape=(None, num_input_tokens), return_sequences=False, return_state=False, dropout=0.2))
     model.add(Dense(NB_DENSE_CELLS))
     model.add(Dropout(0.3))
-    model.add(Dense(2, activation='softmax'))
+    model.add(Dense(2))
+    model.add(Activation('softmax'))
 
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
     return model
@@ -34,9 +34,8 @@ def main():
     weight_file_path = model_dir_path + '/' + model_name + '-weights.h5'
     architecture_file_path = model_dir_path + '/' + model_name + '-architecture.json'
 
-    url_data = pd.read_csv(data_dir_path + os.path.sep + 'URL.txt', sep=',')
-    url_data.columns = ['text', 'label']
-    print(url_data.head())
+    url_data = load_url_data(data_dir_path)
+
     char2idx = dict()
     max_url_seq_length = 0
     for url in url_data['text']:
@@ -70,7 +69,7 @@ def main():
     model = make_lstm_model(num_input_tokens)
     open(architecture_file_path, 'w').write(model.to_json())
 
-    checkpoint = ModelCheckpoint(weight_file_path)
+    checkpoint = ModelCheckpoint(weight_file_path, save_best_only=True)
     model.fit(x=Xtrain, y=Ytrain, batch_size=BATCH_SIZE, epochs=EPOCHS, verbose=VERBOSE, validation_data=(Xtest, Ytest), callbacks=[checkpoint])
     model.save_weights(weight_file_path)
 
