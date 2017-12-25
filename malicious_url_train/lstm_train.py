@@ -1,17 +1,27 @@
 from keras.models import Sequential
-from keras.layers import Dense, Activation
+from keras.callbacks import ModelCheckpoint
+from keras.layers import Dense, Activation, Dropout
 from keras.layers.recurrent import LSTM
 import pandas as pd
 import os
 import numpy as np
 from sklearn.model_selection import train_test_split
 
+BATCH_SIZE = 64
+EPOCHS = 20
+VERBOSE = 1
+NB_LSTM_CELLS = 1024
+
+
 def main():
     np.random.seed(42)
-    
+
     data_dir_path = './data'
     model_dir_path = './models'
     model_name = 'lstm'
+    weight_file_path = model_dir_path + '/' + model_name + '-weights.h5'
+    architecture_file_path = model_dir_path + '/' + model_name + '-architecture.json'
+
     url_data = pd.read_csv(data_dir_path + os.path.sep + 'URL.txt', sep=',')
     url_data.columns = ['text', 'label']
     print(url_data.head())
@@ -43,6 +53,19 @@ def main():
         Y[i, label] = 1
 
     Xtrain, Xtest, Ytrain, Ytest = train_test_split(X, Y, test_size=0.2, random_state=42)
+
+    model = Sequential()
+    model.add(LSTM(NB_LSTM_CELLS, input_shape=(None, num_input_tokens), return_sequences=False, return_state=False, recurrent_dropout=0.2, dropout=0.2))
+    model.add(Dense(512))
+    model.add(Dropout(0.3))
+    model.add(Dense(2, activation='softmax'))
+
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+    open(architecture_file_path, 'w').write(model.to_json())
+
+    checkpoint = ModelCheckpoint(weight_file_path)
+    model.fit(x=Xtrain, y=Ytrain, batch_size=BATCH_SIZE, epochs=EPOCHS, verbose=VERBOSE, validation_data=(Xtest, Ytest), callbacks=[checkpoint])
+    model.save_weights(weight_file_path)
 
 
 if __name__ == '__main__':

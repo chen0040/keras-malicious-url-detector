@@ -6,3 +6,4 @@ pandas
 numpy
 scipy
 matplotlib
+h5py
