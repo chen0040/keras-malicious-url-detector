@@ -5,9 +5,10 @@ from keras.layers.recurrent import LSTM
 from malicious_url_train.url_data_loader import load_url_data
 import numpy as np
 from sklearn.model_selection import train_test_split
+from malicious_url_train.utils import plot_and_save_history
 
 BATCH_SIZE = 64
-EPOCHS = 50
+EPOCHS = 30
 VERBOSE = 1
 NB_LSTM_CELLS = 256
 NB_DENSE_CELLS = 256
@@ -30,6 +31,8 @@ def main():
 
     data_dir_path = './data'
     model_dir_path = './models'
+    report_dir_path = './reports'
+
     model_name = 'bidirectional-lstm'
     weight_file_path = model_dir_path + '/' + model_name + '-weights.h5'
     architecture_file_path = model_dir_path + '/' + model_name + '-architecture.json'
@@ -71,10 +74,11 @@ def main():
 
     checkpoint = ModelCheckpoint(weight_file_path, save_best_only=True)
 
-    model.fit(Xtrain, Ytrain, batch_size=BATCH_SIZE, epochs=EPOCHS, verbose=VERBOSE,
-              validation_data=(Xtest, Ytest), callbacks=[checkpoint])
+    history = model.fit(Xtrain, Ytrain, batch_size=BATCH_SIZE, epochs=EPOCHS, verbose=VERBOSE,
+                        validation_data=(Xtest, Ytest), callbacks=[checkpoint])
 
     model.save_weights(weight_file_path)
+    plot_and_save_history(history, model_name, report_dir_path + '/' + model_name + '-history.png')
 
 
 if __name__ == '__main__':

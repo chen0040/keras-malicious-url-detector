@@ -24,9 +24,13 @@ The following deep learning models have been implemented and studied:
     * training: malicious_url_train/bidirectional_lstm_train.py 
     * predictor: malicious_url_predict/bidirectional_lstm_predict.py 
 
-# Note
+# Performance
 
 Currently the bidirectional LSTM gives the best performance, with 75% - 80% accuracy after 30 to 40 epochs of training   
+
+Below is the training history (loss and accuracy) for the bidirectional LSTM:
+
+![bidirection-lstm-history](/malicious_url_train/reports/bidirectional-lstm-history.png)
 
 # Issues
 
