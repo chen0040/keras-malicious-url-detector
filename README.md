@@ -20,6 +20,13 @@ The following deep learning models have been implemented and studied:
     * training: malicious_url_train/cnn_lstm_train.py 
     * predictor: malicious_url_predict/cnn_lstm_predict.py 
     
+* Bidirectional LSTM: this approach uses Bidirectional LSTM recurrent networks for classifier with categorical cross entropy loss function
+    * training: malicious_url_train/bidirectional_lstm_train.py 
+    * predictor: malicious_url_predict/bidirectional_lstm_predict.py 
+
+# Note
+
+Currently the bidirectional LSTM gives the best performance    
 
 # Issues
 
