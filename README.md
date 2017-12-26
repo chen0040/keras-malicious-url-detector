@@ -26,11 +26,11 @@ The following deep learning models have been implemented and studied:
 
 # Note
 
-Currently the bidirectional LSTM gives the best performance    
+Currently the bidirectional LSTM gives the best performance, with 75% - 80% accuracy after 30 to 40 epochs of training   
 
 # Issues
 
-* Currently the data size of the urls is too small to give an good result
+* Currently the data size of the urls is small
 * Class imbalances - the URL.txt contains class imbalances (more 0 than 1), ideally the problem should be an outlier 
 or anomaly detection problem. To handle the class imabalances, currently a resampling method is used to make sure that 
 there are more or less equal number of each classes
