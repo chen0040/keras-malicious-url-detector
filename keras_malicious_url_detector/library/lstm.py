@@ -1,21 +1,30 @@
 import numpy as np
-
 from malicious_url_train.lstm_train import make_lstm_model
-from malicious_url_train.url_data_loader import load_url_data
 
 
 class LstmPredictor(object):
 
-    model = None
-    num_input_tokens = None
-    idx2char = None
-    char2idx = None
-    max_url_seq_length = None
+    model_name = 'lstm'
 
     def __init__(self):
-        pass
+        self.model = None
+        self.num_input_tokens = None
+        self.idx2char = None
+        self.char2idx = None
+        self.max_url_seq_length = None
 
-    def load_model(self, config_file_path, weight_file_path):
+    @staticmethod
+    def get_config_file_path(model_dir_path):
+        return model_dir_path + '/' + LstmPredictor.model_name + '-config.npy'
+
+    @staticmethod
+    def get_weight_file_path(model_dir_path):
+        return model_dir_path + '/' + LstmPredictor.model_name + '-weights.h5'
+
+    def load_model(self, model_dir_path):
+        config_file_path = self.get_config_file_path(model_dir_path)
+        weight_file_path = self.get_weight_file_path(model_dir_path)
+
         config = np.load(config_file_path).item()
         self.num_input_tokens = config['num_input_tokens']
         self.max_url_seq_length = config['max_url_seq_length']
@@ -34,26 +43,3 @@ class LstmPredictor(object):
         predicted = self.model.predict(X)[0]
         predicted_label = np.argmax(predicted)
         return predicted_label
-
-
-def main():
-    model_name = 'lstm'
-    data_dir_path = '../malicious_url_train/data'
-    model_dir_path = '../malicious_url_train/models'
-    config_file_path = model_dir_path + '/' + model_name + '-config.npy'
-    weight_file_path = model_dir_path + '/' + model_name + '-weights.h5'
-    predictor = LstmPredictor()
-    predictor.load_model(config_file_path=config_file_path, weight_file_path=weight_file_path)
-
-    url_data = load_url_data(data_dir_path)
-    count = 0
-    for url, label in zip(url_data['text'], url_data['label']):
-        predicted_label = predictor.predict(url)
-        print('predicted: ' + str(predicted_label) + ' actual: ' + str(label))
-        count += 1
-        if count > 20:
-            break
-
-
-if __name__ == '__main__':
-    main()

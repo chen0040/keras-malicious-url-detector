@@ -1,7 +1,5 @@
 import numpy as np
-
 from malicious_url_train.bidirectional_lstm_train import make_bidirectional_lstm_model
-from malicious_url_train.url_data_loader import load_url_data
 
 
 class BidirectionalLstmEmbedPredictor(object):
