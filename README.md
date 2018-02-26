@@ -37,10 +37,10 @@ Below is the code in [bidirectional_lstm_train.py](demo/bidirectional_lstm_train
 
 ```python
 from keras_malicious_url_detector.library.bidirectional_lstm import BidirectionalLstmEmbedPredictor
-from malicious_url_train.url_data_loader import load_url_data
+from keras_malicious_url_detector.library.utility.url_data_loader import load_url_data
 import numpy as np
 from keras_malicious_url_detector.library.utility.text_model_extractor import extract_text_model
-from malicious_url_train.utils import plot_and_save_history
+from keras_malicious_url_detector.library.utility.plot_utils import plot_and_save_history
 
 
 def main():
