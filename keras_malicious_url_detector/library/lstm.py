@@ -68,13 +68,13 @@ class LstmPredictor(object):
 
     def extract_training_data(self, url_data):
         data_size = url_data.shape[0]
-        X = np.zeros(shape=(data_size, self.max_url_seq_length))
+        X = np.zeros(shape=(data_size, self.max_url_seq_length, self.num_input_tokens))
         Y = np.zeros(shape=(data_size, 2))
         for i in range(data_size):
             url = url_data['text'][i]
             label = url_data['label'][i]
             for idx, c in enumerate(url):
-                X[i, idx] = self.char2idx[c]
+                X[i, idx, self.char2idx[c]] = 1
             Y[i, label] = 1
 
         return X, Y
