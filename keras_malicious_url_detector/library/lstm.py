@@ -4,9 +4,6 @@ from keras.callbacks import ModelCheckpoint
 from keras.layers import LSTM, Dense, Dropout, Activation
 from sklearn.model_selection import train_test_split
 
-from malicious_url_train.lstm_train import make_lstm_model
-
-
 NB_LSTM_CELLS = 256
 NB_DENSE_CELLS = 256
 

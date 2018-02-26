@@ -4,9 +4,6 @@ from keras.callbacks import ModelCheckpoint
 from keras.layers import Embedding, SpatialDropout1D, Conv1D, MaxPooling1D, LSTM, Dense
 from sklearn.model_selection import train_test_split
 
-from malicious_url_train.cnn_lstm_train import make_cnn_lstm_model
-
-
 NB_LSTM_CELLS = 256
 NB_DENSE_CELLS = 256
 EMBEDDING_SIZE = 100

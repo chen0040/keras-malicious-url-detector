@@ -2,7 +2,6 @@ import numpy as np
 from keras.layers import Embedding, SpatialDropout1D, LSTM, Bidirectional, Dense
 from sklearn.model_selection import train_test_split
 
-from malicious_url_train.bidirectional_lstm_train import make_bidirectional_lstm_model
 from keras.models import Sequential
 from keras.callbacks import ModelCheckpoint
 
