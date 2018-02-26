@@ -40,6 +40,10 @@ class BidirectionalLstmEmbedPredictor(object):
     def get_weight_file_path(model_dir_path):
         return model_dir_path + '/' + BidirectionalLstmEmbedPredictor.model_name + '-weights.h5'
 
+    @staticmethod
+    def get_architecture_file_path(model_dir_path):
+        return model_dir_path + '/' + BidirectionalLstmEmbedPredictor.model_name + '-architecture.json'
+
     def load_model(self, model_dir_path):
         config_file_path = self.get_config_file_path(model_dir_path)
         weight_file_path = self.get_weight_file_path(model_dir_path)
@@ -103,6 +107,9 @@ class BidirectionalLstmEmbedPredictor(object):
         Xtrain, Xtest, Ytrain, Ytest = train_test_split(X, Y, test_size=test_size, random_state=random_state)
 
         self.model = make_bidirectional_lstm_model(self.num_input_tokens, self.max_url_seq_length)
+
+        with open(self.get_architecture_file_path(model_dir_path), 'wt') as f:
+            f.write(self.model.to_json())
 
         history = self.model.fit(Xtrain, Ytrain, batch_size=batch_size, epochs=epochs, verbose=1,
                                  validation_data=(Xtest, Ytest), callbacks=[checkpoint])
